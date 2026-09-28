@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="pt-MZ">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>SENA Funcionário</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde:#0B6E4F;
+    --verde-escuro:#084F39;
+    --ouro:#D4A017;
+    --tinta:#1B1F23;
+    --papel:#FBF9F4;
+    --papel-sombra:#EFEAE0;
+    --linha:#DCD5C7;
+    --erro:#B3261E;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Work Sans',system-ui,sans-serif;
+    background:var(--verde-escuro);
+    color:var(--tinta);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  #app{
+    width:100%;
+    max-width:460px;
+    min-height:100vh;
+    background:var(--papel);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  header{
+    background:var(--verde);
+    color:#fff;
+    padding:18px 20px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  header .brand{
+    font-weight:700;
+    font-size:1.05rem;
+    letter-spacing:0.01em;
+  }
+  header .brand span{color:var(--ouro);}
+  header .sub{
+    font-size:0.78rem;
+    opacity:0.85;
+    margin-top:2px;
+  }
+  #gear{
+    background:rgba(255,255,255,0.14);
+    border:none;
+    color:#fff;
+    width:38px;height:38px;
+    border-radius:50%;
+    font-size:1.1rem;
+    cursor:pointer;
+  }
+  #gear:active{background:rgba(255,255,255,0.28);}
+  main{
+    flex:1;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .screen{display:none;flex-direction:column;gap:18px;}
+  .screen.active{display:flex;}
+  label{
+    font-size:0.82rem;
+    font-weight:600;
+    color:#54524a;
+    display:block;
+    margin-bottom:6px;
+  }
+  input[type=text],input[type=email],input[type=password],input[type=number],select{
+    width:100%;
+    padding:13px 14px;
+    border:1.5px solid var(--linha);
+    border-radius:10px;
+    font-size:1rem;
+    font-family:inherit;
+    background:#fff;
+    color:var(--tinta);
+  }
+  input:focus,select:focus{outline:2px solid var(--verde);outline-offset:1px;}
+  .btn{
+    border:none;
+    border-radius:10px;
+    padding:15px 18px;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .btn-primary{background:var(--verde);color:#fff;}
+  .btn-primary:active{background:var(--verde-escuro);}
+  .btn-gold{background:var(--ouro);color:var(--tinta);}
+  .btn-gold:active{background:#b8890f;}
+  .btn-ghost{background:transparent;color:var(--verde);border:1.5px solid var(--verde);}
+  .btn-text{background:none;border:none;color:#54524a;font-size:0.85rem;text-decoration:underline;cursor:pointer;padding:4px;}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .card{
+    background:#fff;
+    border:1px solid var(--linha);
+    border-radius:var(--radius);
+    padding:18px;
+  }
+  .error-msg{
+    background:#FCEBEA;
+    color:var(--erro);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:0.85rem;
+  }
+  .hint{font-size:0.78rem;color:#8a8778;line-height:1.4;}
+  h1{font-size:1.3rem;margin-bottom:4px;}
+  h2{font-size:1.05rem;margin-bottom:2px;}
+
+  .tabs{display:flex; gap:8px; margin-bottom:6px;}
+  .tab-btn{
+    flex:1; padding:11px; border-radius:10px; border:1.5px solid var(--linha);
+    background:#fff; color:#54524a; font-weight:600; font-size:0.92rem;
+    cursor:pointer; font-family:inherit;
+  }
+  .tab-btn.active{background:var(--verde); border-color:var(--verde); color:#fff;}
+
+  /* Passo a passo de venda */
+  .step-label{
+    display:flex;align-items:center;gap:8px;
+    font-size:0.78rem;font-weight:700;color:var(--verde);
+    text-transform:uppercase;letter-spacing:0.04em;
+  }
+  .qtd-row{display:flex;align-items:center;gap:12px;}
+  .qtd-btn{
+    width:46px;height:46px;border-radius:10px;
+    border:1.5px solid var(--verde);
+    background:#fff;color:var(--verde);
+    font-size:1.4rem;font-weight:700;
+    cursor:pointer;
+  }
+  .qtd-btn:active{background:var(--verde);color:#fff;}
+  .qtd-val{
+    flex:1;text-align:center;font-size:1.5rem;font-weight:700;
+  }
+  .total-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding-top:12px;border-top:1px dashed var(--linha);margin-top:4px;
+  }
+  .total-row .valor{font-size:1.6rem;font-weight:700;color:var(--verde-escuro);}
+
+  /* Recibo estilo talão */
+  #recibo{
+    background:var(--papel);
+    border-radius:2px;
+    padding:22px 18px;
+    position:relative;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  }
+  #recibo::before, #recibo::after{
+    content:"";
+    position:absolute;left:0;right:0;height:10px;
+    background-image:radial-gradient(circle at 8px 5px, var(--verde-escuro) 4px, transparent 4.5px);
+    background-size:16px 10px;
+    background-repeat:repeat-x;
+  }
+  #recibo::before{top:-5px;}
+  #recibo::after{bottom:-5px;transform:rotate(180deg);}
+  .recibo-header{text-align:center;margin-bottom:14px;}
+  .recibo-header .titulo{font-weight:700;font-size:1.05rem;}
+  .recibo-header .numero{font-size:0.78rem;color:#8a8778;margin-top:2px;}
+  .recibo-linha{
+    display:flex;justify-content:space-between;
+    font-size:0.92rem;padding:6px 0;
+  }
+  .recibo-linha.item{border-bottom:1px dashed var(--linha);padding-bottom:10px;margin-bottom:4px;}
+  .recibo-total{
+    display:flex;justify-content:space-between;
+    padding-top:10px;margin-top:6px;border-top:1.5px solid var(--tinta);
+    font-weight:700;font-size:1.15rem;
+  }
+  .recibo-rodape{text-align:center;font-size:0.72rem;color:#8a8778;margin-top:16px;}
+  .recibo-acoes{display:flex;gap:10px;margin-top:18px;}
+  .recibo-acoes .btn{flex:1;}
+
+  /* Catálogo de produtos (lista visível com preços) */
+  .catalogo{
+    max-height:300px; overflow-y:auto;
+    border:1px solid var(--linha); border-radius:10px;
+    background:#fff;
+  }
+  .catalogo-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:11px 14px; border-bottom:1px solid var(--linha);
+    cursor:pointer; font-size:0.9rem;
+  }
+  .catalogo-item:last-child{border-bottom:none;}
+  .catalogo-item:active{background:var(--papel-sombra);}
+  .catalogo-item.sel{background:var(--verde); color:#fff;}
+  .catalogo-item .preco{font-weight:600; color:var(--verde-escuro);}
+  .catalogo-item.sel .preco{color:#fff;}
+
+  /* Carrinho */
+  .catalogo-item{gap:10px;}
+  .catalogo-item.no-carrinho{background:#EAF4EF;}
+  .catalogo-item .nome-preco{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .stepper{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .stp-btn{
+    width:40px;height:40px;border-radius:10px;
+    border:1.5px solid var(--verde);background:#fff;color:var(--verde);
+    font-size:1.25rem;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .stp-btn:active{background:var(--verde);color:#fff;}
+  .stp-q{min-width:24px;text-align:center;font-weight:700;}
+  .carrinho-linha{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 0;border-bottom:1px dashed var(--linha);font-size:0.9rem;
+  }
+  .carrinho-linha .cl-info{flex:1;min-width:0;}
+  .carrinho-linha .cl-nome{font-weight:600;}
+  .carrinho-linha .cl-val{font-weight:700;color:var(--verde-escuro);}
+  .cl-rem{
+    width:32px;height:32px;border-radius:8px;border:1px solid var(--linha);
+    background:#fff;color:var(--erro);cursor:pointer;font-size:0.9rem;
+  }
+
+  /* Vendas recentes */
+  #lista-recentes{display:flex;flex-direction:column;gap:8px;}
+  .recente-item{
+    display:flex;justify-content:space-between;align-items:center;
+    background:#fff;border:1px solid var(--linha);border-radius:10px;
+    padding:10px 14px;font-size:0.85rem;
+  }
+  .recente-item .nome{font-weight:600;}
+  .recente-item .meta{color:#8a8778;font-size:0.75rem;}
+  .recente-item .val{font-weight:700;color:var(--verde-escuro);}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+    background:var(--tinta);color:#fff;padding:12px 20px;border-radius:30px;
+    font-size:0.85rem;opacity:0;pointer-events:none;transition:opacity .25s;
+    z-index:50;max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1;}
+  .spinner{
+    width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.4);
+    border-top-color:#fff;border-radius:50%;
+    animation:spin .7s linear infinite;display:inline-block;vertical-align:-4px;margin-right:6px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  footer.appfoot{
+    text-align:center;padding:14px;font-size:0.7rem;color:#8a8778;
+  }
+
+  /* ---------- Responsivo: tablet e computador ---------- */
+  .venda-grid{display:flex;flex-direction:column;gap:18px;}
+  .col-form{display:flex;flex-direction:column;gap:14px;}
+  .col-side{display:flex;flex-direction:column;gap:10px;}
+
+  @media (min-width:700px){
+    body{padding:28px 16px;}
+    #app{
+      max-width:640px;
+      min-height:auto;
+      border-radius:20px;
+      box-shadow:0 16px 48px rgba(0,0,0,0.35);
+      overflow:hidden;
+    }
+    main{padding:26px 28px;}
+  }
+  @media (min-width:1024px){
+    #app{max-width:960px;}
+    .venda-grid{
+      flex-direction:row;
+      align-items:flex-start;
+      gap:32px;
+    }
+    .col-form{flex:1.3;}
+    .col-side{
+      flex:1;
+      background:var(--papel-sombra);
+      border-radius:var(--radius);
+      padding:18px;
+      position:sticky;top:20px;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div>
+      <div class="brand">SENA <span>Funcionário</span></div>
+      <div class="sub" id="cabecalho-sub">Registo de vendas</div>
+    </div>
+    <button id="gear" title="Configurações" onclick="irPara('config')">⚙</button>
+  </header>
+
+  <main>
+
+    <!-- ECRÃ: Configuração Supabase -->
+    <section class="screen" id="screen-config">
+      <h1>Ligar ao SENA Gestor</h1>
+      <p class="hint">Introduza os dados do mesmo projeto Supabase usado no sena-gestor. Isto só é necessário uma vez neste aparelho.</p>
+      <div>
+        <label for="cfg-url">URL do Supabase</label>
+        <input type="text" id="cfg-url" placeholder="https://xxxx.supabase.co">
+      </div>
+      <div>
+        <label for="cfg-key">Chave anónima (anon key)</label>
+        <input type="text" id="cfg-key" placeholder="eyJhbGciOi...">
+      </div>
+      <div id="config-erro"></div>
+      <button class="btn btn-primary" onclick="guardarConfig()">Guardar e continuar</button>
+      <button class="btn btn-ghost" onclick="entrarModoTeste()">Testar agora com dados de exemplo</button>
+      <p class="hint">A app usa funções (RPC) criadas pelo script sena-funcionario-setup.sql — verificar_funcionario, produtos_do_gestor e registar_venda_funcionario. Corre esse script no Supabase antes de usar a app a sério.</p>
+    </section>
+
+    <!-- ECRÃ: Login -->
+    <section class="screen" id="screen-login">
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-entrar" onclick="mudarAbaLogin('entrar')">Entrar</button>
+        <button class="tab-btn" id="tab-criar" onclick="mudarAbaLogin('criar')">Criar conta</button>
+      </div>
+
+      <div id="painel-entrar">
+        <p class="hint">Email do negócio (o mesmo do sena-gestor) e a tua senha de funcionário.</p>
+        <div>
+          <label for="login-email">Email do negócio</label>
+          <input type="email" id="login-email" autocomplete="off">
+        </div>
+        <div>
+          <label for="login-pass">Senha do funcionário</label>
+          <input type="password" id="login-pass" autocomplete="off">
+        </div>
+        <div id="login-erro"></div>
+        <button class="btn btn-primary" id="btn-login" onclick="fazerLogin()">Entrar</button>
+      </div>
+
+      <div id="painel-criar" style="display:none;">
+        <p class="hint">Cria a tua conta de funcionário. Precisas de saber o email do negócio onde trabalhas.</p>
+        <div>
+          <label for="criar-email">Email do negócio</label>
+          <input type="email" id="criar-email" autocomplete="off">
+        </div>
+        <div>
+          <label for="criar-nome">O teu nome</label>
+          <input type="text" id="criar-nome" autocomplete="off">
+        </div>
+        <div>
+          <label for="criar-pass">Cria uma senha</label>
+          <input type="password" id="criar-pass" autocomplete="off" placeholder="Mínimo 4 caracteres">
+        </div>
+        <div id="criar-erro"></div>
+        <button class="btn btn-primary" id="btn-criar-conta" onclick="criarContaFuncionario()">Criar conta</button>
+      </div>
+
+      <button class="btn-text" onclick="irPara('config')">Mudar ligação ao Supabase</button>
+    </section>
+
+    <!-- ECRÃ: Nova venda -->
+    <section class="screen" id="screen-venda">
+     <div class="venda-grid">
+      <div class="col-form">
+      <div class="step-label">Passo 1 — Escolher produtos</div>
+      <div class="catalogo" id="catalogo-produtos"></div>
+      <button class="btn-text" onclick="abrirSugerirProduto()">+ Sugerir novo produto</button>
+
+      <div class="step-label">Passo 2 — Carrinho e total</div>
+      <div class="card">
+        <div id="carrinho-itens"><p class="hint">Ainda não escolheste produtos.</p></div>
+        <div class="total-row">
+          <span class="hint" id="carrinho-resumo">0 produtos</span>
+          <span class="valor mono" id="valor-mostrado">0,00 MT</span>
+        </div>
+        <button class="btn-text" id="btn-limpar" onclick="limparCarrinho()" style="display:none;">Limpar carrinho</button>
+      </div>
+
+      <div id="venda-erro"></div>
+      <button class="btn btn-gold" id="btn-registar" onclick="registarVenda()">Registar venda e emitir recibo</button>
+      </div>
+
+      <div class="col-side">
+        <div class="step-label" style="margin-bottom:8px;">Vendas recentes</div>
+        <div id="lista-recentes"><p class="hint">Ainda sem vendas nesta sessão.</p></div>
+        <button class="btn-text" onclick="terminarSessao()">Terminar sessão</button>
+      </div>
+     </div>
+    </section>
+
+    <!-- ECRÃ: Sugerir produto -->
+    <section class="screen" id="screen-sugerir">
+      <h1>Sugerir novo produto</h1>
+      <p class="hint">Fica pendente até o gestor aprovar no sena-gestor. Só depois disso aparece na lista de vendas.</p>
+      <div>
+        <label for="sug-nome">Nome do produto</label>
+        <input type="text" id="sug-nome" placeholder="Ex: Farinha 1kg">
+      </div>
+      <div>
+        <label for="sug-preco">Preço (MT)</label>
+        <input type="number" id="sug-preco" min="0" step="0.01">
+      </div>
+      <div id="sugerir-erro"></div>
+      <button class="btn btn-primary" id="btn-sugerir" onclick="enviarSugestaoProduto()">Enviar sugestão</button>
+      <button class="btn-text" onclick="irPara('venda')">Cancelar</button>
+    </section>
+
+
+    <!-- ECRÃ: Recibo -->
+    <section class="screen" id="screen-recibo">
+      <div id="recibo">
+        <div class="recibo-header">
+          <div class="titulo" id="rec-empresa">Recibo de Venda</div>
+          <div class="numero mono" id="rec-numero">Nº —</div>
+          <div class="numero mono" id="rec-data">—</div>
+        </div>
+        <div id="rec-itens"></div>
+        <div class="recibo-total">
+          <span>Total</span>
+          <span class="mono" id="rec-total">—</span>
+        </div>
+        <div class="recibo-rodape" id="rec-rodape">— · —</div>
+      </div>
+      <div class="recibo-acoes">
+        <button class="btn btn-ghost" onclick="gerarPDF()">Descarregar PDF</button>
+        <button class="btn btn-primary" onclick="novaVenda()">Nova venda</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="appfoot">SENA Funcionário · dados sincronizados com o sena-gestor</footer>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ---------- Configuração ---------- */
+const CONFIG_KEY = 'sena_func_config_v1';
+const SESSAO_KEY = 'sena_func_sessao_v1';
+let CFG = null;
+let supabase = null;
+let sessaoFuncionario = null; // { funcionario_id, funcionario_nome, gestor_user_id, gestor_email }
+let produtos = [];
+const carrinho = new Map(); // id do produto -> { produto, qtd, gravado, registoId }
+let vendasRecentes = [];
+let ultimaVenda = null;
+let DEMO_MODE = false;
+
+const PRODUTOS_DEMO = [
+  { id: 'demo-1', nome: 'Arroz 5kg', precoSugerido: 350 },
+  { id: 'demo-2', nome: 'Óleo 1L', precoSugerido: 180 },
+  { id: 'demo-3', nome: 'Açúcar 2kg', precoSugerido: 150 },
+  { id: 'demo-4', nome: 'Sabão em barra', precoSugerido: 45 },
+  { id: 'demo-5', nome: 'Refrigerante 500ml', precoSugerido: 60 }
+];
+
+function entrarModoTeste(){
+  DEMO_MODE = true;
+  irPara('login');
+  mostrarToast('Modo de teste: usa qualquer email/senha para entrar ou criar conta.');
+}
+
+function ativarSessaoDemo(nome){
+  sessaoFuncionario = {
+    funcionario_id: 'demo-funcionario',
+    funcionario_nome: nome || 'Funcionário Teste',
+    gestor_user_id: 'demo-gestor',
+    gestor_email: 'teste@exemplo.com',
+    nome_negocio: 'Loja de Teste',
+    pacote: 'pro',
+    assinatura_estado: 'trial',
+    assinatura_fim: new Date(Date.now() + 365*24*60*60*1000).toISOString()
+  };
+  atualizarCabecalhoNegocio();
+  produtos = PRODUTOS_DEMO;
+  carrinho.clear();
+  renderCatalogo();
+  renderCarrinho();
+  irPara('venda');
+}
+
+function irPara(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+
+function mostrarToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function carregarConfig(){
+  const raw = localStorage.getItem(CONFIG_KEY);
+  if(!raw) return null;
+  try{ return JSON.parse(raw); }catch(e){ return null; }
+}
+
+function guardarConfig(){
+  const url = document.getElementById('cfg-url').value.trim();
+  const key = document.getElementById('cfg-key').value.trim();
+  const erroEl = document.getElementById('config-erro');
+  erroEl.innerHTML = '';
+  if(!url || !key){
+    erroEl.innerHTML = '<div class="error-msg">Preencha o URL e a chave anónima.</div>';
+    return;
+  }
+  CFG = { url, key };
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(CFG));
+  iniciarSupabaseEir();
+}
+
+function iniciarSupabaseEir(){
+  // Só carrega a biblioteca do Supabase depois de termos as chaves,
+  // para não bloquear a abertura do ficheiro localmente no telemóvel.
+  if(window.supabase && supabase){
+    depoisDeLigar();
+    return;
+  }
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  script.onload = () => {
+    supabase = window.supabase.createClient(CFG.url, CFG.key);
+    depoisDeLigar();
+  };
+  script.onerror = () => {
+    document.getElementById('config-erro').innerHTML = '<div class="error-msg">Não foi possível carregar a biblioteca do Supabase. Verifique a ligação à internet.</div>';
+  };
+  document.head.appendChild(script);
+}
+
+function atualizarCabecalhoNegocio(){
+  document.getElementById('cabecalho-sub').textContent =
+    (sessaoFuncionario.nome_negocio || 'Negócio') + ' · ' + sessaoFuncionario.funcionario_nome;
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function precoDe(p){ return Number(p.precoSugerido) || 0; }
+
+function controloHTML(id){
+  const item = carrinho.get(String(id));
+  if(!item) return '<button class="stp-btn" data-acao="mais" aria-label="Adicionar">+</button>';
+  return '<button class="stp-btn" data-acao="menos" aria-label="Menos">−</button>' +
+         '<span class="stp-q mono">' + item.qtd + '</span>' +
+         '<button class="stp-btn" data-acao="mais" aria-label="Mais">+</button>';
+}
+
+function renderCatalogo(){
+  const el = document.getElementById('catalogo-produtos');
+  if(!el) return;
+  if(produtos.length === 0){
+    el.innerHTML = '<p class="hint" style="padding:12px;">Sem produtos disponíveis. Usa "Sugerir novo produto" para pedires ao gestor para adicionar um.</p>';
+    return;
+  }
+  el.innerHTML = produtos.map(p => `
+    <div class="catalogo-item${carrinho.has(String(p.id)) ? ' no-carrinho' : ''}" data-id="${esc(p.id)}">
+      <div class="nome-preco">
+        <span class="nome">${esc(p.nome)}</span>
+        <span class="preco mono">${formatarMT(precoDe(p))}</span>
+      </div>
+      <div class="stepper">${controloHTML(p.id)}</div>
+    </div>
+  `).join('');
+}
+
+// Atualiza só a linha mexida, para o catálogo não voltar ao topo
+function atualizarLinhaCatalogo(id){
+  const row = [...document.querySelectorAll('.catalogo-item')].find(r => r.dataset.id === String(id));
+  if(!row) return;
+  row.classList.toggle('no-carrinho', carrinho.has(String(id)));
+  row.querySelector('.stepper').innerHTML = controloHTML(id);
+}
+
+async function depoisDeLigar(){
+  const raw = localStorage.getItem(SESSAO_KEY);
+  if(raw){
+    try{
+      sessaoFuncionario = JSON.parse(raw);
+      atualizarCabecalhoNegocio();
+      await carregarProdutos();
+      irPara('venda');
+      return;
+    }catch(e){ /* sessão inválida, segue para login */ }
+  }
+  irPara('login');
+}
+
+/* ---------- Login ---------- */
+async function fazerLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const erroEl = document.getElementById('login-erro');
+  const btn = document.getElementById('btn-login');
+  erroEl.innerHTML = '';
+  if(!email || !pass){
+    erroEl.innerHTML = '<div class="error-msg">Preencha o email do negócio e a senha do funcionário.</div>';
+    return;
+  }
+
+  if(DEMO_MODE){
+    ativarSessaoDemo('Funcionário Teste');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>A entrar…';
+
+  const { data, error } = await supabase.rpc('verificar_funcionario', {
+    p_email_gestor: email,
+    p_senha: pass
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Entrar';
+
+  if(error){
+    erroEl.innerHTML = '<div class="error-msg">Erro ao entrar: ' + error.message + '</div>';
+    return;
+  }
+  if(!data || data.length === 0){
+    erroEl.innerHTML = '<div class="error-msg">Email do negócio ou senha do funcionário incorretos.</div>';
+    return;
+  }
+
+  const linha = data[0];
+  if(!assinaturaValida(linha)){
+    erroEl.innerHTML = '<div class="error-msg">Este negócio está com o pagamento em atraso — pede ao gestor para renovar a assinatura no sena-gestor.</div>';
+    return;
+  }
+  sessaoFuncionario = construirSessao(linha);
+  localStorage.setItem(SESSAO_KEY, JSON.stringify(sessaoFuncionario));
+  atualizarCabecalhoNegocio();
+  await carregarProdutos();
+  irPara('venda');
+}
+
+function assinaturaValida(linha){
+  if(!linha.assinatura_estado) return true; // sem info -> não bloqueia por engano
+  if(linha.assinatura_estado === 'expirado' || linha.assinatura_estado === 'pendente') return false;
+  if(linha.assinatura_fim && new Date(linha.assinatura_fim) < new Date()) return false;
+  return true;
+}
+
+function construirSessao(linha){
+  return {
+    funcionario_id: linha.funcionario_id,
+    funcionario_nome: linha.funcionario_nome,
+    gestor_user_id: linha.gestor_user_id,
+    gestor_email: linha.gestor_email,
+    nome_negocio: linha.nome_negocio,
+    pacote: linha.pacote || 'basico',
+    assinatura_estado: linha.assinatura_estado,
+    assinatura_fim: linha.assinatura_fim
+  };
+}
+
+function mudarAbaLogin(aba){
+  document.getElementById('tab-entrar').classList.toggle('active', aba==='entrar');
+  document.getElementById('tab-criar').classList.toggle('active', aba==='criar');
+  document.getElementById('painel-entrar').style.display = aba==='entrar' ? 'block' : 'none';
+  document.getElementById('painel-criar').style.display = aba==='criar' ? 'block' : 'none';
+}
+
+async function criarContaFuncionario(){
+  const emailGestor = document.getElementById('criar-email').value.trim();
+  const nome = document.getElementById('criar-nome').value.trim();
+  const senha = document.getElementById('criar-pass').value;
+  const erroEl = document.getElementById('criar-erro');
+  const btn = document.getElementById('btn-criar-conta');
+  erroEl.innerHTML = '';
+
+  if(!emailGestor || !nome || !senha){
+    erroEl.innerHTML = '<div class="error-msg">Preenche todos os campos.</div>';
+    return;
+  }
+  if(senha.length < 4){
+    erroEl.innerHTML = '<div class="error-msg">A senha precisa de pelo menos 4 caracteres.</div>';
+    return;
+  }
+
+  if(DEMO_MODE){
+    ativarSessaoDemo(nome);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>A criar conta…';
+
+  const { data, error } = await supabase.rpc('registar_funcionario', {
+    p_email_gestor: emailGestor,
+    p_nome: nome,
+    p_senha: senha
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Criar conta';
+
+  if(error){
+    erroEl.innerHTML = '<div class="error-msg">Não foi possível criar a conta: ' + error.message + '</div>';
+    return;
+  }
+
+  const linha = Array.isArray(data) ? data[0] : data;
+  if(!assinaturaValida(linha)){
+    erroEl.innerHTML = '<div class="error-msg">Este negócio está com o pagamento em atraso — pede ao gestor para renovar a assinatura no sena-gestor.</div>';
+    return;
+  }
+  sessaoFuncionario = construirSessao(linha);
+  localStorage.setItem(SESSAO_KEY, JSON.stringify(sessaoFuncionario));
+  atualizarCabecalhoNegocio();
+  await carregarProdutos();
+  irPara('venda');
+}
+
+function terminarSessao(){
+  localStorage.removeItem(SESSAO_KEY);
+  sessaoFuncionario = null;
+  produtos = [];
+  carrinho.clear();
+  vendasRecentes = [];
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+  if(DEMO_MODE){
+    DEMO_MODE = false;
+    irPara('config');
+  } else {
+    irPara('login');
+  }
+}
+
+/* ---------- Produtos ---------- */
+async function carregarProdutos(){
+  const el = document.getElementById('catalogo-produtos');
+  el.innerHTML = '<p class="hint" style="padding:12px;">A carregar produtos…</p>';
+  const { data, error } = await supabase.rpc('produtos_do_gestor', {
+    p_funcionario_id: sessaoFuncionario.funcionario_id,
+    p_gestor_user_id: sessaoFuncionario.gestor_user_id
+  });
+
+  if(error){
+    el.innerHTML = '<p class="hint" style="padding:12px;">Erro ao carregar produtos.</p>';
+    mostrarToast('Não foi possível carregar os produtos: ' + error.message);
+    return;
+  }
+  produtos = data || [];
+  carrinho.clear();
+  renderCatalogo();
+  renderCarrinho();
+}
+
+/* ---------- Sugerir novo produto ---------- */
+function abrirSugerirProduto(){
+  if(sessaoFuncionario && sessaoFuncionario.pacote === 'basico'){
+    mostrarToast('Sugerir produtos é uma funcionalidade do plano Pro. Pede ao gestor para atualizar o pacote.');
+    return;
+  }
+  document.getElementById('sug-nome').value = '';
+  document.getElementById('sug-preco').value = '';
+  document.getElementById('sugerir-erro').innerHTML = '';
+  irPara('sugerir');
+}
+
+async function enviarSugestaoProduto(){
+  const nome = document.getElementById('sug-nome').value.trim();
+  const preco = Number(document.getElementById('sug-preco').value);
+  const erroEl = document.getElementById('sugerir-erro');
+  const btn = document.getElementById('btn-sugerir');
+  erroEl.innerHTML = '';
+
+  if(!nome || !preco || preco <= 0){
+    erroEl.innerHTML = '<div class="error-msg">Preencha o nome e um preço válido.</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>A enviar…';
+
+  if(DEMO_MODE){
+    await new Promise(r => setTimeout(r, 400));
+    btn.disabled = false;
+    btn.textContent = 'Enviar sugestão';
+    mostrarToast('Sugestão enviada (modo de teste — não fica gravada).');
+    irPara('venda');
+    return;
+  }
+
+  const { error } = await supabase.rpc('sugerir_produto', {
+    p_funcionario_id: sessaoFuncionario.funcionario_id,
+    p_gestor_user_id: sessaoFuncionario.gestor_user_id,
+    p_nome: nome,
+    p_preco: preco
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Enviar sugestão';
+
+  if(error){
+    erroEl.innerHTML = '<div class="error-msg">Erro ao enviar: ' + error.message + '</div>';
+    return;
+  }
+  mostrarToast('Sugestão enviada — fica pendente até o gestor aprovar.');
+  irPara('venda');
+}
+
+/* ---------- Carrinho ---------- */
+function alterarItem(id, delta){
+  id = String(id);
+  const p = produtos.find(x => String(x.id) === id);
+  if(!p) return;
+  let item = carrinho.get(id);
+  if(item && item.gravado) return;
+  if(!item){
+    if(delta < 0) return;
+    item = { produto: p, qtd: 0, gravado: false };
+    carrinho.set(id, item);
+  }
+  item.qtd += delta;
+  if(item.qtd <= 0) carrinho.delete(id);
+  atualizarLinhaCatalogo(id);
+  renderCarrinho();
+}
+
+function removerItem(id){
+  id = String(id);
+  const item = carrinho.get(id);
+  if(!item || item.gravado) return;
+  carrinho.delete(id);
+  atualizarLinhaCatalogo(id);
+  renderCarrinho();
+}
+
+function limparCarrinho(){
+  // itens já gravados numa tentativa que falhou a meio não se apagam
+  [...carrinho.keys()].forEach(id => { if(!carrinho.get(id).gravado) carrinho.delete(id); });
+  renderCatalogo();
+  renderCarrinho();
+}
+
+function totalCarrinho(){
+  let t = 0;
+  carrinho.forEach(i => { t += precoDe(i.produto) * i.qtd; });
+  return Math.round(t * 100) / 100;
+}
+
+function renderCarrinho(){
+  const el = document.getElementById('carrinho-itens');
+  let unidades = 0;
+  carrinho.forEach(i => { unidades += i.qtd; });
+  const n = carrinho.size;
+  if(n === 0){
+    el.innerHTML = '<p class="hint">Ainda não escolheste produtos.</p>';
+  } else {
+    el.innerHTML = [...carrinho.entries()].map(([id, i]) => `
+      <div class="carrinho-linha">
+        <div class="cl-info">
+          <div class="cl-nome">${esc(i.produto.nome)}${i.gravado ? ' ✓' : ''}</div>
+          <div class="hint mono">${i.qtd} x ${formatarMT(precoDe(i.produto))}</div>
+        </div>
+        <div class="cl-val mono">${formatarMT(precoDe(i.produto) * i.qtd)}</div>
+        ${i.gravado ? '' : '<button class="cl-rem" data-id="' + esc(id) + '" onclick="removerItem(this.dataset.id)" aria-label="Remover">✕</button>'}
+      </div>
+    `).join('');
+  }
+  document.getElementById('carrinho-resumo').textContent =
+    n + (n === 1 ? ' produto' : ' produtos') + ' · ' + unidades + (unidades === 1 ? ' unidade' : ' unidades');
+  document.getElementById('valor-mostrado').textContent = formatarMT(totalCarrinho());
+  document.getElementById('btn-limpar').style.display = n ? '' : 'none';
+}
+
+document.getElementById('catalogo-produtos').addEventListener('click', (e) => {
+  const row = e.target.closest('.catalogo-item');
+  if(!row) return;
+  const btn = e.target.closest('[data-acao]');
+  alterarItem(row.dataset.id, btn && btn.dataset.acao === 'menos' ? -1 : 1);
+});
+
+function formatarMT(v){
+  return Number(v).toLocaleString('pt-MZ', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' MT';
+}
+
+/* ---------- Registar venda ---------- */
+async function registarVenda(){
+  const erroEl = document.getElementById('venda-erro');
+  erroEl.innerHTML = '';
+  if(carrinho.size === 0){
+    erroEl.innerHTML = '<div class="error-msg">Escolhe pelo menos um produto.</div>';
+    return;
+  }
+  const btn = document.getElementById('btn-registar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>A registar…';
+
+  // Uma gravação por produto, uma de cada vez, para o gestor receber cada item certo
+  // (e para duas gravações seguidas não se sobreporem).
+  for(const item of carrinho.values()){
+    if(item.gravado) continue;
+    const p = item.produto;
+    const unit = precoDe(p);
+    let novoId, error = null;
+
+    if(DEMO_MODE){
+      await new Promise(r => setTimeout(r, 250));
+      novoId = 'demo-' + Date.now() + '-' + item.qtd;
+    } else {
+      const resp = await supabase.rpc('registar_venda_funcionario', {
+        p_funcionario_id: sessaoFuncionario.funcionario_id,
+        p_gestor_user_id: sessaoFuncionario.gestor_user_id,
+        p_produto_id: String(p.id),
+        p_produto_nome: p.nome,
+        p_quantidade: item.qtd,
+        p_valor_unitario: unit,
+        p_valor_total: Math.round(unit * item.qtd * 100) / 100
+      });
+      error = resp.error;
+      novoId = resp.data && resp.data.id;
+    }
+
+    if(error){
+      btn.disabled = false;
+      btn.textContent = 'Registar venda e emitir recibo';
+      erroEl.innerHTML = '<div class="error-msg">Erro ao gravar "' + esc(p.nome) + '": ' + esc(error.message) +
+        '. Os produtos com ✓ já foram gravados — toca em registar outra vez para enviar os restantes.</div>';
+      renderCarrinho();
+      return;
+    }
+    item.gravado = true;
+    item.registoId = novoId;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Registar venda e emitir recibo';
+
+  const itens = [...carrinho.values()].map(i => ({
+    id: i.registoId,
+    produto_nome: i.produto.nome,
+    quantidade: i.qtd,
+    valor_unitario: precoDe(i.produto),
+    valor_total: Math.round(precoDe(i.produto) * i.qtd * 100) / 100
+  }));
+  ultimaVenda = {
+    id: itens[0].id || Date.now(),
+    itens,
+    valor_total: Math.round(itens.reduce((s, i) => s + i.valor_total, 0) * 100) / 100
+  };
+  vendasRecentes.unshift(ultimaVenda);
+  vendasRecentes = vendasRecentes.slice(0, 8);
+  renderRecentes();
+  mostrarRecibo(ultimaVenda);
+  carrinho.clear();
+  renderCatalogo();
+  renderCarrinho();
+}
+
+function renderRecentes(){
+  const el = document.getElementById('lista-recentes');
+  if(vendasRecentes.length === 0){
+    el.innerHTML = '<p class="hint">Ainda sem vendas nesta sessão.</p>';
+    return;
+  }
+  el.innerHTML = vendasRecentes.map(v => {
+    const n = v.itens.length;
+    const un = v.itens.reduce((s, i) => s + i.quantidade, 0);
+    const titulo = esc(v.itens[0].produto_nome) + (n > 1 ? ' +' + (n - 1) : '');
+    return `
+    <div class="recente-item">
+      <div>
+        <div class="nome">${titulo}</div>
+        <div class="meta">${n} ${n === 1 ? 'produto' : 'produtos'} · Qtd: ${un}</div>
+      </div>
+      <div class="val mono">${formatarMT(v.valor_total)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- Recibo ---------- */
+function mostrarRecibo(venda){
+  const agora = new Date();
+  document.getElementById('rec-empresa').textContent = (sessaoFuncionario && sessaoFuncionario.nome_negocio) || 'Recibo de Venda';
+  document.getElementById('rec-numero').textContent = 'Nº ' + (venda.id || agora.getTime());
+  document.getElementById('rec-data').textContent =
+    'Data: ' + agora.toLocaleDateString('pt-MZ') + ' ' + agora.toLocaleTimeString('pt-MZ', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('rec-itens').innerHTML = venda.itens.map(i => `
+    <div class="recibo-linha">
+      <span>${esc(i.produto_nome)}</span>
+      <span class="mono">x${i.quantidade}</span>
+    </div>
+    <div class="recibo-linha item">
+      <span class="hint">${formatarMT(i.valor_unitario)} cada</span>
+      <span class="mono">${formatarMT(i.valor_total)}</span>
+    </div>
+  `).join('');
+  document.getElementById('rec-total').textContent = formatarMT(venda.valor_total);
+  document.getElementById('rec-rodape').textContent =
+    'Atendido por ' + (sessaoFuncionario ? sessaoFuncionario.funcionario_nome : '');
+  irPara('recibo');
+}
+
+function novaVenda(){
+  carrinho.clear();
+  renderCatalogo();
+  renderCarrinho();
+  document.getElementById('venda-erro').innerHTML = '';
+  irPara('venda');
+}
+
+/* ---------- PDF ---------- */
+let jsPDFCarregado = false;
+function carregarJsPDF(callback){
+  if(jsPDFCarregado){ callback(); return; }
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  script.onload = () => { jsPDFCarregado = true; callback(); };
+  script.onerror = () => mostrarToast('Não foi possível carregar o gerador de PDF.');
+  document.head.appendChild(script);
+}
+
+function gerarPDF(){
+  if(!ultimaVenda) return;
+  carregarJsPDF(() => {
+    const { jsPDF } = window.jspdf;
+    const v = ultimaVenda;
+    const limpo = s => String(s).replace(/[\u00a0\u202f]/g, ' ');
+
+    // O recibo cresce com o número de produtos: mede primeiro, cria depois
+    const medir = new jsPDF({ unit:'mm', format:[80, 200] });
+    medir.setFont('courier','normal'); medir.setFontSize(9);
+    const linhas = v.itens.map(i => medir.splitTextToSize(limpo(i.produto_nome) + '  x' + i.quantidade, 68));
+    const altura = 80 + linhas.reduce((s, l) => s + l.length * 4.5 + 8, 0);
+
+    const doc = new jsPDF({ unit:'mm', format:[80, altura] });
+    let y = 12;
+    doc.setFont('courier','bold'); doc.setFontSize(12);
+    doc.text(limpo(document.getElementById('rec-empresa').textContent), 40, y, {align:'center'}); y += 7;
+    doc.setFont('courier','normal'); doc.setFontSize(9);
+    doc.text(limpo(document.getElementById('rec-numero').textContent), 40, y, {align:'center'}); y += 5;
+    doc.text(limpo(document.getElementById('rec-data').textContent), 40, y, {align:'center'}); y += 8;
+    doc.line(6, y, 74, y); y += 6;
+
+    v.itens.forEach((i, k) => {
+      linhas[k].forEach(l => { doc.text(l, 6, y); y += 4.5; });
+      doc.text(limpo(formatarMT(i.valor_unitario)) + ' cada', 6, y);
+      doc.text(limpo(formatarMT(i.valor_total)), 74, y, {align:'right'}); y += 8;
+    });
+
+    doc.line(6, y, 74, y); y += 7;
+    doc.setFont('courier','bold'); doc.setFontSize(11);
+    doc.text('TOTAL', 6, y);
+    doc.text(limpo(formatarMT(v.valor_total)), 74, y, {align:'right'}); y += 10;
+    doc.setFont('courier','normal'); doc.setFontSize(7.5);
+    doc.text(limpo(document.getElementById('rec-rodape').textContent), 40, y, {align:'center'});
+    doc.save('recibo-' + Date.now() + '.pdf');
+  });
+}
+
+/* ---------- Arranque ---------- */
+(function iniciar(){
+  CFG = carregarConfig();
+  if(CFG){
+    document.getElementById('cfg-url').value = CFG.url;
+    document.getElementById('cfg-key').value = CFG.key;
+    iniciarSupabaseEir();
+  } else {
+    irPara('config');
+  }
+})();
+</script>
+</body>
+</html>
